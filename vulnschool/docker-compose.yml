@@ -1,0 +1,91 @@
+# =============================================================================
+# VulnSchool - Docker Compose
+# ⚠️  PERINGATAN: Aplikasi ini SENGAJA DIBUAT RENTAN!
+#     JANGAN PERNAH deploy ke jaringan publik / production!
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Web Application (CodeIgniter 4 + Apache)
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vulnschool-web
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount source code untuk hot-reload saat development
+      - .:/var/www/html
+      # Jangan mount vendor dari host, gunakan yang di container
+      - /var/www/html/vendor
+    environment:
+      - CI_ENVIRONMENT=development
+      - database.default.hostname=db
+      - database.default.database=vulnschool
+      - database.default.username=vulnschool
+      - database.default.password=vulnschool123
+      - database.default.DBDriver=MySQLi
+      - database.default.port=3306
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - vulnschool-net
+
+  # ---------------------------------------------------------------------------
+  # MySQL 8.0
+  # ---------------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: vulnschool-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vulnschool
+      MYSQL_USER: vulnschool
+      MYSQL_PASSWORD: vulnschool123
+    volumes:
+      - vulnschool-db-data:/var/lib/mysql
+      # Folder untuk inisialisasi SQL otomatis saat pertama kali
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - vulnschool-net
+
+  # ---------------------------------------------------------------------------
+  # phpMyAdmin
+  # ---------------------------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: vulnschool-pma
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - vulnschool-net
+
+volumes:
+  vulnschool-db-data:
+    driver: local
+
+networks:
+  vulnschool-net:
+    driver: bridge

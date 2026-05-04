@@ -1,0 +1,34 @@
+# =============================================================================
+# VulnSchool - Docker Ignore
+# File/folder yang TIDAK perlu di-copy ke Docker image
+# =============================================================================
+
+.git
+.gitignore
+.env.example
+.vscode
+.idea
+
+# Dokumentasi
+README.md
+VULNERABILITIES.md
+LICENSE
+
+# Docker files (tidak perlu di dalam container)
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Testing
+tests/
+phpunit.xml.dist
+phpunit*.xml
+
+# Vendor di-install di dalam container
+vendor/
+
+# Writable akan di-mount atau di-create di container
+writable/cache/*
+writable/logs/*
+writable/session/*
+writable/debugbar/*

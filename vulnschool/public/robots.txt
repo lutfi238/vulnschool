@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /backup/
+Disallow: /test.php
+Disallow: /info.php
+
+# VULN-INFO-001: Information Disclosure via robots.txt
+# File ini secara eksplisit membocorkan struktur direktori sensitif
+# kepada pengunjung (dan mesin pencari). Attacker bisa menggunakan
+# file ini sebagai peta jalan untuk melakukan recon lanjutan.
