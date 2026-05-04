@@ -130,3 +130,12 @@ _modules/*
 !/public/uploads/.gitkeep
 !/public/uploads/foto/
 !/public/uploads/foto/.gitkeep
+
+# Session files di public/null (session handler null)
+/public/null/
+
+# Marker inisialisasi Docker (jangan di-commit agar mahasiswa dapat fresh setup)
+/writable/.vulnschool_initialized
+
+# Environment file aktif (gunakan .env.example sebagai referensi)
+.env
